@@ -1,0 +1,98 @@
+openapi: 3.1.0
+
+info:
+  title: OBD2 API
+  version: 1.0.0
+  description: API para la aplicación de diagnóstico vehicular.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/v1/auth/google:
+    post:
+      tags:
+        - Authentication
+      summary: Login con Google
+      description: |
+        Autentica un usuario utilizando un idToken generado por Google.
+
+        Si el usuario no existe, el sistema lo registra automáticamente
+        y devuelve un JWT para acceder a los demás microservicios.
+      operationId: loginWithGoogle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleLoginRequest'             
+      responses:
+        '200':
+          description: Login exitoso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              example:
+                accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                expiresIn: 3600
+                tokenType: Bearer
+                user:
+                  id: c8d2f4c1-3f8e-4b72-9d4d-1d3c1d8a8e11
+                  name: Sebastián
+                  lastName: Fajardo
+                  email: sebastian@email.com
+                  photoUrl: https://lh3.googleusercontent.com/...
+        '401':
+          description: Token de Google inválido.
+        '500':
+          description: Error interno del servidor.
+
+components:
+  schemas:
+
+    GoogleLoginRequest:
+      type: object
+      required:
+        - idToken
+      properties:
+        idToken:
+          type: string
+          description: Token de identidad generado por Google.
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+          example: Sebastián
+        lastName:
+          type: string
+          example: Fajardo
+        email:
+          type: string
+          format: email
+          example: sebastian@gmail.com
+        photoUrl:
+          type: string
+          example: https://lh3.googleusercontent.com/...
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          example: 3600
+        tokenType:
+          type: string
+          example: Bearer
+        user:
+          $ref: '#/components/schemas/User'
