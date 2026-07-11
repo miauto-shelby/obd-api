@@ -226,3 +226,5 @@ DELETE /api/v1/vehicles/{vehicleId}
 | 404  | `VEHICLE_NOT_FOUND`          | No existe el vehículo solicitado.                              |
 | 409  | `VEHICLE_HAS_ACTIVE_SESSION` | El vehículo tiene una sesión OBD activa y no puede eliminarse. |
 | 500  | `INTERNAL_ERROR`             | Error interno del servidor.                                    |
+
+## 7.
