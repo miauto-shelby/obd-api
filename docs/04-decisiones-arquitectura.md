@@ -297,3 +297,149 @@ El sistema recibe lecturas de kilometraje desde el dispositivo OBDII.
 **Estado**
 
 ✅ Aprobada.
+
+# ADR-010 Selección del vehículo activo
+
+**Tema**
+Un usuario puede registrar uno o varios vehículos en la aplicación.
+
+**Decisión**
+
+- Si el usuario tiene un solo vehículo, la aplicación lo seleccionará automáticamente.
+- Si tiene varios vehículos, la aplicación recordará el último vehículo utilizado.
+- El usuario podrá cambiar el vehículo activo en cualquier momento.
+- No se devolverá el VIN en la consulta de listado.
+
+**Justificación**
+
+- Mejora la experiencia de usuario.
+- Reduce la cantidad de pasos al ingresar a la aplicación.
+- Facilita la conexión con el dispositivo OBDII.
+
+**Estado**
+
+✅ Aprobada.
+
+# ADR-011 – Registro de vehículos mediante VIN
+
+**Tema**
+
+- El sistema debe poder registrar un vehículo mediante su VIN.
+- Durante el registro de un vehículo, la aplicación necesita obtener información como marca, modelo, año, motor y tipo de combustible.
+
+**Decisión**
+
+- El sistema intentará consultar automáticamente la información del vehículo utilizando el VIN.
+- Si la consulta no devuelve resultados o la información es incompleta, el usuario podrá ingresar manualmente los datos faltantes.
+
+**Justificación**
+
+- Reduce el tiempo de registro.
+- Disminuye errores de digitación.
+- Permite registrar vehículos aunque no exista información disponible.
+
+**Consecuencias**
+
+- El Vehicle Service deberá integrarse con un proveedor de información vehicular (cuando esté disponible).
+- La aplicación deberá permitir la edición manual de los campos.
+
+**Estado**
+
+✅ Aprobada.
+
+# ADR-013 – Origen del kilometraje
+
+**Tema**
+
+El kilometraje es la base para calcular mantenimientos, alertas y estadísticas.
+
+**Decisión**
+
+- El usuario no podrá ingresar manualmente el kilometraje al registrar un vehículo.
+- El kilometraje inicial y sus actualizaciones solo podrán provenir de una lectura válida del dispositivo OBDII.
+
+**Justificación**
+
+- Evita errores de digitación.
+- Evita manipulación intencional del kilometraje.
+- Garantiza que las alertas y mantenimientos se basen en datos confiables.
+
+**Consecuencias**
+
+- Un vehículo recién registrado no tendrá kilometraje hasta su primera conexión con el OBDII.
+- El OBD Service será la única fuente autorizada para actualizar el kilometraje.
+- El Vehicle Service seguirá siendo el propietario del dato y almacenará el valor actual y su historial.
+
+**Estado**
+
+✅ Aprobada.
+
+# ADR-014 – Modificación del VIN
+
+**Decisión:**
+
+- El VIN podrá modificarse únicamente mientras el vehículo no tenga información operativa asociada.
+- Si ya existen lecturas OBD, diagnósticos, mantenimientos o alertas, el VIN quedará bloqueado.
+- Si es necesario cambiarlo después, deberá hacerlo un administrador mediante un proceso controlado.
+
+**Justificación:**
+
+- la experiencia del usuario con la integridad de la información y evita problemas cuando el vehículo ya tiene un historial asociado.
+
+**Estado:**
+
+✅ Aprobada.
+
+# ADR-015 – Campos editables del vehículo
+
+**Tema**
+
+Los campos del vehículo que se pueden editar por el usuario.
+
+**Decisión**
+
+- nickname
+- plate
+
+**Justificación**
+
+- Evita manipulación intencional del vehículo.
+- Evitar romper el historial de diagnósticos y mantenimientos.
+
+**Estado**
+
+✅ Aprobada.
+
+# ADR-016 – Eliminación de vehículos
+
+**Tema**
+
+Permitir eliminar un vehículo.
+
+**contexto**
+
+- El Vehicle Service permite la eliminación lógica de vehículos.
+- Sin embargo, un vehículo puede tener una sesión OBDII activa mientras se están realizando lecturas, diagnósticos o captura de datos.
+- También pueden presentarse fallos de comunicación, pérdida de conexión Bluetooth o errores del OBD Service que dejen una sesión abierta de forma incorrecta.
+
+**Decisión**
+
+Un vehículo no podrá eliminarse mientras tenga una sesión OBD activa.
+
+El OBD Service deberá garantizar el cierre de las sesiones mediante alguno de los siguientes mecanismos:
+
+- Cierre normal de la sesión por parte del usuario.
+- Cierre automático por inactividad (timeout).
+- Cierre por detección de error de comunicación.
+- Cierre administrativo (Force Close) realizado por un usuario con permisos de administrador.
+
+**Justificación**
+
+- Evita eliminar un vehículo mientras existen operaciones en ejecución.
+- Protege la integridad de las lecturas y diagnósticos.
+- Permite recuperar sesiones bloqueadas sin afectar al usuario.
+- Evita que un error técnico impida administrar el vehículo.
+
+**Estado**
+
+✅ Aprobada.

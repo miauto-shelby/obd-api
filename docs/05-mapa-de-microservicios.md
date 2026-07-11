@@ -63,15 +63,48 @@ Administrar toda la información relacionada con los vehículos registrados por 
 - Eliminar vehículo.
 - Asociar vehículos a usuarios.
 
+## Decisiones
+
+- El vehículo se identifica mediante UUID.
+- La placa no será el identificador del sistema.
+- Se almacenará el último kilometraje conocido.
+- El historial de kilometraje será utilizado para mantenimientos y notificaciones.
+- No se almacenará el color del vehículo en la primera versión.
+
+## Entidad principal
+
+| Campo          | Tipo     | Obligatorio |
+| -------------- | -------- | ----------- |
+| vehicleId      | UUID     | Sí          |
+| userId         | UUID     | Sí          |
+| nickname       | String   | No          |
+| plate          | String   | Sí          |
+| vin            | String   | Sí          |
+| brand          | String   | Sí          |
+| model          | String   | Sí          |
+| year           | Integer  | Sí          |
+| engine         | String   | Sí          |
+| fuelType       | String   | Sí          |
+| transmission   | String   | Sí          |
+| currentMileage | Integer  | Sí          |
+| createdAt      | DateTime | Sí          |
+| updatedAt      | DateTime | Sí          |
+
 ## APIs
 
 | Método | Endpoint                       | Descripción             |
 | ------ | ------------------------------ | ----------------------- |
 | POST   | `/api/v1/vehicles`             | Registrar un vehículo.  |
+| GET    | `/api/v1/vehicles/vin/{vin}`   | Registrar un vehículo.  |
 | GET    | `/api/v1/vehicles`             | Listar mis vehículos.   |
 | GET    | `/api/v1/vehicles/{vehicleId}` | Consultar un vehículo.  |
 | PUT    | `/api/v1/vehicles/{vehicleId}` | Actualizar un vehículo. |
 | DELETE | `/api/v1/vehicles/{vehicleId}` | Eliminar un vehículo.   |
+
+## Funcionalidades futuras
+
+| PATCH | `/api/v1/vehicles/{vehicleId}/vin` |(Sujeto a reglas de negocio)|
+| POST | `/api/v1/vehicles/{vehicleId}/force-disconnect` |(Sujeto a reglas de negocio)|
 
 ## Base de datos
 
@@ -219,5 +252,39 @@ Pendiente.
 ## Publica
 
 - Información de mantenimiento.
+
+**Estado:** ⏳ Pendiente.
+
+---
+
+# 7. actualizar el VIN
+
+## Responsabilidad
+
+Permite actualizar el VIN de un vehículo.
+
+## Funcionalidades
+
+- Solo si el vehículo no tiene lecturas OBD.
+- Solo si no tiene diagnósticos.
+- Solo si no tiene mantenimientos.
+
+## APIs
+
+| Método | Endpoint                           |
+| ------ | ---------------------------------- |
+| PATCH  | `/api/v1/vehicles/{vehicleId}/vin` |
+
+## Request
+
+...
+
+## Response
+
+...
+
+## Errores
+
+...
 
 **Estado:** ⏳ Pendiente.
