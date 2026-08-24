@@ -1,0 +1,12 @@
+# Google OAuth client secrets
+client_secret_*.json
+
+# Local and editor files
+.idea/
+.vscode/
+*.swp
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
