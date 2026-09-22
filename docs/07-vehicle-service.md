@@ -45,7 +45,7 @@ La respuesta de creación es `201` con el vehículo registrado. La respuesta de 
 - La placa es única dentro de la cuenta del usuario.
 - El VIN, cuando se proporcione, debe tener 17 caracteres válidos.
 - `currentMileage` es el kilometraje inicial registrado manualmente. Las lecturas posteriores de OBD2 requerirán su propio contrato, para no sobrescribir datos sin trazabilidad.
-- La edición, eliminación, consulta por VIN y conexión OBD2 se definirán como endpoints posteriores.
+- La edición completa del perfil, eliminación, consulta por VIN y conexión OBD2 se definirán como endpoints posteriores. En esta etapa solo se permite actualizar el VIN.
 
 ## Consultar detalle
 
