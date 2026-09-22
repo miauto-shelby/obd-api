@@ -115,6 +115,34 @@ paths:
           description: Access Token inválido o vencido.
         '404':
           description: El vehículo no existe o no pertenece a la cuenta.
+    patch:
+      tags:
+        - Vehicles
+      summary: Actualiza la información básica de un vehículo propio
+      operationId: updateVehicleProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleProfileRequest'
+      responses:
+        '200':
+          description: Vehículo actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Datos inválidos o sin cambios permitidos.
+        '401':
+          description: Access Token inválido o vencido.
+        '404':
+          description: El vehículo no existe o no pertenece a la cuenta.
 
   /api/v1/vehicles/{vehicleId}/vin:
     patch:
@@ -214,7 +242,6 @@ components:
         - brand
         - model
         - year
-        - currentMileage
       properties:
         nickname:
           type: [string, 'null']
@@ -234,10 +261,6 @@ components:
         year:
           type: integer
           example: 2022
-        currentMileage:
-          type: integer
-          minimum: 0
-          example: 48500
         engine:
           type: [string, 'null']
         fuelType:
@@ -263,6 +286,32 @@ components:
             updatedAt:
               type: string
               format: date-time
+            currentMileage:
+              type: [integer, 'null']
+              minimum: 0
+              description: Última lectura válida enviada por OBD2. Es null antes de la primera lectura.
+
+    UpdateVehicleProfileRequest:
+      type: object
+      properties:
+        nickname:
+          type: [string, 'null']
+          maxLength: 60
+        brand:
+          type: string
+          maxLength: 60
+        model:
+          type: string
+          maxLength: 80
+        engine:
+          type: [string, 'null']
+          maxLength: 40
+        fuelType:
+          type: [string, 'null']
+          maxLength: 32
+        transmission:
+          type: [string, 'null']
+          maxLength: 32
 
     UpdateVehicleVinRequest:
       type: object
