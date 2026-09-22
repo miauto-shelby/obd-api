@@ -94,7 +94,67 @@ paths:
         '409':
           description: Ya existe un vehículo con esa placa en la cuenta.
 
+  /api/v1/vehicles/{vehicleId}:
+    get:
+      tags:
+        - Vehicles
+      summary: Consulta el detalle de un vehículo propio
+      operationId: getVehicle
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '200':
+          description: Vehículo de la cuenta autenticada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Access Token inválido o vencido.
+        '404':
+          description: El vehículo no existe o no pertenece a la cuenta.
+
+  /api/v1/vehicles/{vehicleId}/vin:
+    patch:
+      tags:
+        - Vehicles
+      summary: Registra o corrige el VIN de un vehículo propio
+      operationId: updateVehicleVin
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVehicleVinRequest'
+      responses:
+        '200':
+          description: Vehículo actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: VIN inválido.
+        '401':
+          description: Access Token inválido o vencido.
+        '404':
+          description: El vehículo no existe o no pertenece a la cuenta.
+
 components:
+  parameters:
+    VehicleId:
+      name: vehicleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   securitySchemes:
     bearerAuth:
       type: http
@@ -203,6 +263,15 @@ components:
             updatedAt:
               type: string
               format: date-time
+
+    UpdateVehicleVinRequest:
+      type: object
+      required:
+        - vin
+      properties:
+        vin:
+          type: [string, 'null']
+          description: VIN de 17 caracteres o null cuando sigue pendiente.
 
     VehicleListResponse:
       type: object
