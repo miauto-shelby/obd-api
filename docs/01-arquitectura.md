@@ -36,3 +36,4 @@ La aplicación móvil se encarga únicamente de presentar esos datos e iniciar l
 - 03-auth-service.md
 - 04-adr.md
 - 05-mapa-de-microservicios.md
+- 08-diagramas-flujo-rutas.md
