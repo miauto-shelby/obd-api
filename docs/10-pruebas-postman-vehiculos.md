@@ -5,7 +5,15 @@
 1. Iniciar el backend con `npm run dev` desde `D:\OBD2-PLATAFORM`.
 2. Importar `postman/My-Auto-Vehicle-Validation.postman_collection.json` en Postman.
 3. Confirmar primero que `01 - Estado del backend` responda `200` con `{ "status": "ok" }`.
-4. Pegar un `accessToken` válido en la variable `accessToken` de la colección. El token se obtiene al iniciar sesión con Google en la app; no debe guardarse ni compartirse por chat, correo o repositorios.
+4. Generar un `accessToken` temporal desde el backend. Primero se debe iniciar sesión una vez en la app con el correo de pruebas; después, agregar `POSTMAN_TEST_MODE=true` al `.env` local y ejecutar desde `D:\OBD2-PLATAFORM`:
+
+```powershell
+npm run postman:token -- tu-correo@ejemplo.com
+```
+
+5. Copiar el valor completo que muestra la consola y pegarlo en la variable `accessToken` de la colección. El token vence en una hora, no abre una ruta nueva en el backend y no debe guardarse ni compartirse por chat, correo, capturas o repositorios.
+
+Cada desarrollador genera su propio token temporal en su equipo. Si el comando indica que el correo no existe, debe iniciar sesión primero con esa cuenta en la app contra la misma base de datos de pruebas.
 
 ## Orden de prueba
 
