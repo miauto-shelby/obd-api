@@ -141,7 +141,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Usuario toca un vehículo] --> B[GET /api/v1/vehicles/{vehicleId} + accessToken]
+    A[Usuario toca un vehículo] --> B[GET detalle del vehículo + accessToken]
     B --> C[Backend valida sesión]
     C --> D[(MongoDB: buscar vehículo y propietario)]
     D --> E{¿Existe y pertenece a la cuenta?}
@@ -154,7 +154,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Usuario edita datos básicos] --> B[PATCH /api/v1/vehicles/{vehicleId} + accessToken]
+    A[Usuario edita datos básicos] --> B[PATCH datos básicos del vehículo + accessToken]
     B --> C[Backend valida sesión y propiedad]
     C --> D{¿Vehículo propio?}
     D -->|No| E[404: vehículo no encontrado]
@@ -170,7 +170,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Usuario registra o corrige VIN] --> B[PATCH /api/v1/vehicles/{vehicleId}/vin + accessToken]
+    A[Usuario registra o corrige VIN] --> B[PATCH VIN del vehículo + accessToken]
     B --> C[Backend valida sesión y propiedad]
     C --> D{¿Vehículo propio?}
     D -->|No| E[404: vehículo no encontrado]
@@ -185,7 +185,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Administrador reporta corrección] --> B[PATCH /api/v1/admin/vehicles/{vehicleId}/plate]
+    A[Administrador reporta corrección] --> B[PATCH placa del vehículo como administrador]
     B --> C[Backend valida sesión]
     C --> D{¿Correo incluido en ADMIN_EMAILS?}
     D -->|No| E[403: acceso administrativo requerido]
