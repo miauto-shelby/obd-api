@@ -33,6 +33,7 @@ La regla es: una ruta nueva no se considera terminada si no tiene contrato, diag
 | Vehículos | `GET /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#8-consultar-un-vehículo) |
 | Vehículos | `PATCH /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#9-actualizar-información-básica-del-vehículo) |
 | Vehículos | `PATCH /api/v1/vehicles/{vehicleId}/vin` | Disponible | [Ver flujo](#10-registrar-o-corregir-el-vin) |
+| Administración | `PATCH /api/v1/admin/vehicles/{vehicleId}/plate` | Disponible | [Ver flujo](#11-corregir-una-placa-por-un-administrador) |
 
 > Nota para arquitectura: las cuatro rutas de autenticación se encuentran implementadas en el backend y descritas en `docs/03-auth-service.md`. Su incorporación completa a `openapi/openapi.yaml` queda como tarea de sincronización documental.
 
@@ -178,6 +179,22 @@ flowchart TD
     F -->|Sí| H[(MongoDB: guardar VIN o null)]
     H --> I[200: vehículo actualizado]
     I --> J[Aplicación muestra el nuevo estado]
+```
+
+## 11. Corregir una placa por un administrador
+
+```mermaid
+flowchart TD
+    A[Administrador reporta corrección] --> B[PATCH /api/v1/admin/vehicles/{vehicleId}/plate]
+    B --> C[Backend valida sesión]
+    C --> D{¿Correo incluido en ADMIN_EMAILS?}
+    D -->|No| E[403: acceso administrativo requerido]
+    D -->|Sí| F[Validar nueva placa y motivo]
+    F --> G{¿Placa válida, diferente y disponible globalmente?}
+    G -->|No| H[400 o 409: explicar corrección requerida]
+    G -->|Sí| I[(MongoDB: actualizar placa y guardar auditoría)]
+    I --> J[200: vehículo actualizado]
+    J --> K[Historial conserva placa anterior, motivo y responsable]
 ```
 
 ## Próximo diagrama: lecturas OBD2

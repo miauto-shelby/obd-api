@@ -25,7 +25,8 @@ Después ejecutar las solicitudes 07 a 09. Deben fallar de manera controlada:
 | --- | --- | --- |
 | 07 Kilometraje manual | `400 VALIDATION_ERROR` | El kilometraje solo llegará desde OBD2. |
 | 08 VIN inválido | `400 VALIDATION_ERROR` | El VIN debe tener 17 caracteres válidos. |
-| 09 Placa duplicada | `409 VEHICLE_ALREADY_EXISTS` | La misma cuenta no puede crear dos vehículos con la misma placa. |
+| 09 Placa duplicada | `409 VEHICLE_ALREADY_EXISTS` | Ninguna cuenta puede registrar una placa que ya exista en la plataforma. |
+| 10 Corrección administrativa de placa | `200` | Solo el administrador puede corregir una placa errónea y debe indicar el motivo. |
 
 ## Cómo corregir un dato
 
@@ -33,6 +34,7 @@ Después ejecutar las solicitudes 07 a 09. Deben fallar de manera controlada:
 - VIN: usar `06 - Registrar VIN`; se puede enviar `null` para dejarlo pendiente.
 - Kilometraje: no se corrige manualmente. Quedará pendiente hasta que llegue una lectura OBD2 validada.
 - Placa y año: aún no tienen ruta de edición. Esta decisión depende de las reglas de negocio de Vehicle Service para evitar cambios que afecten historiales futuros.
+- Placa por error de digitación: usar la ruta administrativa solo con un token de un correo configurado en `ADMIN_EMAILS`. La solicitud debe incluir la nueva placa y un motivo. No está disponible para usuarios normales.
 
 ## Evidencia para la arquitecta
 

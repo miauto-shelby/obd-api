@@ -14,11 +14,13 @@
     { "name": "06 - Registrar VIN", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"vin\": \"1HGCM82633A004352\" }" }, "url": "{{baseUrl}}/api/v1/vehicles/{{vehicleId}}/vin" } },
     { "name": "07 - Error: kilometraje manual", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"plate\": \"BAD001\", \"brand\": \"Chevrolet\", \"model\": \"Onix\", \"year\": 2022, \"currentMileage\": 50000 }" }, "url": "{{baseUrl}}/api/v1/vehicles" } },
     { "name": "08 - Error: VIN inválido", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"vin\": \"VIN-INCORRECTO\" }" }, "url": "{{baseUrl}}/api/v1/vehicles/{{vehicleId}}/vin" } },
-    { "name": "09 - Error: placa duplicada", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"plate\": \"ABC123\", \"brand\": \"Chevrolet\", \"model\": \"Onix\", \"year\": 2022 }" }, "url": "{{baseUrl}}/api/v1/vehicles" } }
+    { "name": "09 - Error: placa duplicada", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"plate\": \"ABC123\", \"brand\": \"Chevrolet\", \"model\": \"Onix\", \"year\": 2022 }" }, "url": "{{baseUrl}}/api/v1/vehicles" } },
+    { "name": "10 - Admin: corregir placa", "event": [{ "listen": "test", "script": { "exec": ["pm.test('Placa corregida', function () { pm.response.to.have.status(200); });"] } }], "request": { "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminAccessToken}}", "type": "string" }] }, "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"plate\": \"XYZ789\",\n  \"reason\": \"Corrección de error de digitación confirmado durante la validación.\"\n}" }, "url": "{{baseUrl}}/api/v1/admin/vehicles/{{vehicleId}}/plate" } }
   ],
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8080" },
     { "key": "accessToken", "value": "PEGA_AQUI_UN_TOKEN_VALIDO" },
-    { "key": "vehicleId", "value": "" }
+    { "key": "vehicleId", "value": "" },
+    { "key": "adminAccessToken", "value": "PEGA_AQUI_EL_TOKEN_DEL_ADMINISTRADOR" }
   ]
 }
