@@ -143,6 +143,24 @@ paths:
           description: Access Token inválido o vencido.
         '404':
           description: El vehículo no existe o no pertenece a la cuenta.
+    delete:
+      tags:
+        - Vehicles
+      summary: Desactiva un vehículo propio sin borrar su historial
+      operationId: deactivateVehicle
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      responses:
+        '204':
+          description: Vehículo desactivado correctamente.
+        '401':
+          description: Access Token inválido o vencido.
+        '404':
+          description: El vehículo no existe, no pertenece a la cuenta o ya está inactivo.
+        '409':
+          description: El vehículo tiene una sesión OBD2 activa.
 
   /api/v1/vehicles/{vehicleId}/vin:
     patch:
@@ -290,6 +308,13 @@ components:
               type: [integer, 'null']
               minimum: 0
               description: Última lectura válida enviada por OBD2. Es null antes de la primera lectura.
+            status:
+              type: string
+              enum: [ACTIVE, INACTIVE]
+              description: Estado interno del vehículo. Las rutas de usuario solo muestran vehículos activos.
+            obdSessionActive:
+              type: boolean
+              description: Indica si una sesión OBD2 está activa; impide la desactivación mientras sea true.
 
     UpdateVehicleProfileRequest:
       type: object

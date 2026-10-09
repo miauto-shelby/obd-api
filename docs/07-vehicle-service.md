@@ -13,6 +13,7 @@ Cada vehículo pertenece al usuario de la sesión autenticada. Este primer alcan
 | `GET` | `/api/v1/vehicles/{vehicleId}` | Consulta el detalle de un vehículo propio. |
 | `PATCH` | `/api/v1/vehicles/{vehicleId}/vin` | Registra, corrige o deja pendiente el VIN de un vehículo propio. |
 | `PATCH` | `/api/v1/vehicles/{vehicleId}` | Actualiza la información básica del vehículo. |
+| `DELETE` | `/api/v1/vehicles/{vehicleId}` | Desactiva un vehículo propio sin borrar su historial. |
 | `PATCH` | `/api/v1/admin/vehicles/{vehicleId}/plate` | Corrige una placa errónea; solo administrador y con auditoría. |
 
 Todas requieren `Authorization: Bearer <accessToken>`. El usuario se obtiene del token. La app no puede asignar el vehículo a otra cuenta. La última ruta exige además que el correo del token esté configurado como administrador en el backend.
@@ -46,7 +47,7 @@ La respuesta de creación es `201` con el vehículo registrado. La respuesta de 
 - La placa es única en toda la plataforma, incluso si la intenta registrar otra cuenta.
 - El VIN, cuando se proporcione, debe tener 17 caracteres válidos.
 - `currentMileage` es un dato de lectura OBD2, no un campo que el usuario pueda registrar o editar. Mientras no haya adaptador conectado su valor es `null`.
-- La eliminación, consulta por VIN y conexión OBD2 se definirán como endpoints posteriores.
+- La consulta por VIN y la conexión OBD2 se definirán como endpoints posteriores.
 
 ## Consultar detalle
 
@@ -65,6 +66,14 @@ El valor debe tener 17 caracteres válidos. También puede recibirse `null` para
 ## Actualizar información básica
 
 `PATCH /api/v1/vehicles/{vehicleId}` permite actualizar `nickname`, `brand`, `model`, `engine`, `fuelType` y `transmission`. Los campos opcionales pueden enviarse como `null` para dejarlos pendientes. La placa, el año y el kilometraje no se editan mediante esta ruta.
+
+## Desactivar vehículo
+
+`DELETE /api/v1/vehicles/{vehicleId}` no borra físicamente el vehículo. Lo marca como inactivo y responde `204` sin cuerpo. Desde ese momento no aparece en el listado de la cuenta ni se puede consultar o editar como vehículo activo.
+
+- La placa y el historial se conservan para proteger la trazabilidad del vehículo; por ello la placa sigue siendo única en toda la plataforma.
+- Solo el propietario autenticado puede desactivar su vehículo. Un identificador ajeno o inexistente responde `404`.
+- Si una futura integración marca una sesión OBD2 como activa, la ruta responderá `409 OBD_SESSION_ACTIVE` hasta que dicha sesión termine.
 
 ## Corregir placa como administrador
 
