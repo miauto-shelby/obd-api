@@ -6,7 +6,7 @@ Este documento muestra, de forma visual y editable, qué ocurre cuando una aplic
 
 Los diagramas están escritos con **Mermaid**, por lo que GitHub los muestra como diagramas y cualquier integrante puede actualizar el texto directamente en este archivo. No son imágenes fijas.
 
-**Última actualización:** 26 de septiembre de 2026.
+**Última actualización:** 9 de octubre de 2026.
 
 ## Cómo mantenerlo actualizado
 
@@ -34,6 +34,9 @@ La regla es: una ruta nueva no se considera terminada si no tiene contrato, diag
 | Vehículos | `PATCH /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#9-actualizar-información-básica-del-vehículo) |
 | Vehículos | `PATCH /api/v1/vehicles/{vehicleId}/vin` | Disponible | [Ver flujo](#10-registrar-o-corregir-el-vin) |
 | Administración | `PATCH /api/v1/admin/vehicles/{vehicleId}/plate` | Disponible | [Ver flujo](#11-corregir-una-placa-por-un-administrador) |
+| Vehículos | `DELETE /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#12-retirar-un-vehículo-de-la-lista) |
+| Vehículos | `GET /api/v1/vehicles/active` | Disponible | [Ver flujo](#13-consultar-el-vehículo-activo) |
+| Vehículos | `PUT /api/v1/vehicles/active` | Disponible | [Ver flujo](#14-cambiar-el-vehículo-activo) |
 
 > Nota para arquitectura: las cuatro rutas de autenticación se encuentran implementadas en el backend y descritas en `docs/03-auth-service.md`. Su incorporación completa a `openapi/openapi.yaml` queda como tarea de sincronización documental.
 
@@ -195,6 +198,53 @@ flowchart TD
     G -->|Sí| I[(MongoDB: actualizar placa y guardar auditoría)]
     I --> J[200: vehículo actualizado]
     J --> K[Historial conserva placa anterior, motivo y responsable]
+```
+
+## 12. Retirar un vehículo de la lista
+
+```mermaid
+flowchart TD
+    A[Usuario elige retirar un vehículo] --> B[DELETE vehículo + accessToken]
+    B --> C[Backend valida sesión y propiedad]
+    C --> D{¿Vehículo propio y activo?}
+    D -->|No| E[404: vehículo no encontrado]
+    D -->|Sí| F{¿Tiene sesión OBD2 activa?}
+    F -->|Sí| G[409: terminar la sesión OBD2 primero]
+    F -->|No| H[(MongoDB: marcar vehículo inactivo)]
+    H --> I[204: retiro confirmado sin borrar historial]
+    I --> J{¿Era el vehículo activo?}
+    J -->|Sí| K[La próxima consulta usa otro vehículo disponible]
+    J -->|No| L[La selección actual se conserva]
+```
+
+## 13. Consultar el vehículo activo
+
+```mermaid
+flowchart TD
+    A[Aplicación abre el inicio] --> B[GET vehículo activo + accessToken]
+    B --> C[Backend valida sesión]
+    C --> D{¿Sesión válida?}
+    D -->|No| E[401: volver al inicio de sesión]
+    D -->|Sí| F[(MongoDB: buscar último vehículo activo)]
+    F --> G{¿Existe un vehículo activo?}
+    G -->|No| H[404: mostrar opción para agregar o elegir vehículo]
+    G -->|Sí| I[200: detalle del vehículo activo]
+    I --> J[Aplicación muestra placa, datos y kilometraje disponible]
+```
+
+## 14. Cambiar el vehículo activo
+
+```mermaid
+flowchart TD
+    A[Usuario toca Cambiar vehículo] --> B[Aplicación lista vehículos propios]
+    B --> C[Usuario elige un vehículo]
+    C --> D[PUT vehículo activo + accessToken]
+    D --> E[Backend valida sesión y propiedad]
+    E --> F{¿Vehículo propio y activo?}
+    F -->|No| G[404: informar que no está disponible]
+    F -->|Sí| H[(MongoDB: guardar última selección)]
+    H --> I[200: vehículo activo actualizado]
+    I --> J[Aplicación refresca la pantalla principal]
 ```
 
 ## Próximo diagrama: lecturas OBD2
