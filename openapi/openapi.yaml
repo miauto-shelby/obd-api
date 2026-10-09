@@ -162,6 +162,52 @@ paths:
         '409':
           description: El vehículo tiene una sesión OBD2 activa.
 
+  /api/v1/vehicles/active:
+    get:
+      tags: [Vehicles]
+      summary: Consulta el vehículo activo de la cuenta
+      operationId: getActiveVehicle
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Vehículo activo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Access Token inválido o vencido.
+        '404':
+          description: La cuenta no tiene vehículos activos.
+    put:
+      tags: [Vehicles]
+      summary: Cambia el vehículo activo de la cuenta
+      operationId: selectActiveVehicle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vehicleId]
+              properties:
+                vehicleId:
+                  type: string
+      responses:
+        '200':
+          description: Vehículo activo actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Access Token inválido o vencido.
+        '404':
+          description: El vehículo no existe, está inactivo o no pertenece a la cuenta.
+
   /api/v1/vehicles/{vehicleId}/vin:
     patch:
       tags:

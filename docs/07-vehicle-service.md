@@ -10,6 +10,8 @@ Cada vehículo pertenece al usuario de la sesión autenticada. Este primer alcan
 | --- | --- | --- |
 | `POST` | `/api/v1/vehicles` | Registra un vehículo del usuario autenticado. |
 | `GET` | `/api/v1/vehicles` | Lista los vehículos del usuario autenticado. |
+| `GET` | `/api/v1/vehicles/active` | Consulta el vehículo activo de la cuenta. |
+| `PUT` | `/api/v1/vehicles/active` | Cambia el vehículo activo de la cuenta. |
 | `GET` | `/api/v1/vehicles/{vehicleId}` | Consulta el detalle de un vehículo propio. |
 | `PATCH` | `/api/v1/vehicles/{vehicleId}/vin` | Registra, corrige o deja pendiente el VIN de un vehículo propio. |
 | `PATCH` | `/api/v1/vehicles/{vehicleId}` | Actualiza la información básica del vehículo. |
@@ -52,6 +54,18 @@ La respuesta de creación es `201` con el vehículo registrado. La respuesta de 
 ## Consultar detalle
 
 `GET /api/v1/vehicles/{vehicleId}` devuelve el vehículo solicitado cuando pertenece a la cuenta de la sesión. Si no existe o pertenece a otra cuenta, responde `404` sin revelar información de otro usuario.
+
+## Vehículo activo
+
+`GET /api/v1/vehicles/active` devuelve el último vehículo activo de la cuenta. Si solo existe un vehículo, queda seleccionado automáticamente al crearlo. Si no hay vehículos activos, responde `404 ACTIVE_VEHICLE_NOT_FOUND`.
+
+`PUT /api/v1/vehicles/active` permite cambiar la selección:
+
+```json
+{ "vehicleId": "id-del-vehiculo-propio" }
+```
+
+El vehículo debe pertenecer a la cuenta y estar activo. La respuesta `200` devuelve el vehículo que quedó seleccionado. La selección se guarda en el backend para que se mantenga al cambiar de teléfono.
 
 ## Registrar o corregir VIN
 
