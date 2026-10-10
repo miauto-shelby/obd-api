@@ -92,7 +92,7 @@ paths:
         '401':
           description: Access Token inválido o vencido.
         '409':
-          description: Ya existe un vehículo con esa placa en la cuenta.
+          description: Ya existe un vehículo con esa placa o VIN en toda la plataforma.
 
   /api/v1/vehicles/{vehicleId}:
     get:
@@ -237,6 +237,8 @@ paths:
           description: Access Token inválido o vencido.
         '404':
           description: El vehículo no existe o no pertenece a la cuenta.
+        '409':
+          description: El VIN ya está asignado a otro vehículo (`VIN_ALREADY_REGISTERED`).
 
 components:
   parameters:
@@ -315,7 +317,7 @@ components:
           example: ABC123
         vin:
           type: [string, 'null']
-          description: VIN de 17 caracteres. Puede ser null mientras no esté disponible.
+          description: VIN único de 17 caracteres. Puede ser null mientras no esté disponible.
         brand:
           type: string
           example: Chevrolet
@@ -391,7 +393,7 @@ components:
       properties:
         vin:
           type: [string, 'null']
-          description: VIN de 17 caracteres o null cuando sigue pendiente.
+          description: VIN único de 17 caracteres o null cuando sigue pendiente.
 
     VehicleListResponse:
       type: object

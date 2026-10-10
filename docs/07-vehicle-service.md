@@ -47,7 +47,7 @@ La respuesta de creación es `201` con el vehículo registrado. La respuesta de 
 ## Reglas iniciales
 
 - La placa es única en toda la plataforma, incluso si la intenta registrar otra cuenta.
-- El VIN, cuando se proporcione, debe tener 17 caracteres válidos.
+- El VIN, cuando se proporcione, debe tener 17 caracteres válidos y es único en toda la plataforma. Puede permanecer en `null` mientras no esté disponible.
 - `currentMileage` es un dato de lectura OBD2, no un campo que el usuario pueda registrar o editar. Mientras no haya adaptador conectado su valor es `null`.
 - La consulta por VIN y la conexión OBD2 se definirán como endpoints posteriores.
 
@@ -75,7 +75,7 @@ El vehículo debe pertenecer a la cuenta y estar activo. La respuesta `200` devu
 { "vin": "1HGCM82633A004352" }
 ```
 
-El valor debe tener 17 caracteres válidos. También puede recibirse `null` para conservar el vehículo y marcar el VIN como pendiente. La respuesta es `200` con el vehículo actualizado.
+El valor debe tener 17 caracteres válidos. También puede recibirse `null` para conservar el vehículo y marcar el VIN como pendiente. Un VIN ya asignado a otro vehículo responde `409 VIN_ALREADY_REGISTERED`. La respuesta correcta es `200` con el vehículo actualizado.
 
 ## Actualizar información básica
 
