@@ -212,8 +212,8 @@ paths:
     patch:
       tags:
         - Vehicles
-      summary: Registra o corrige el VIN de un vehículo propio
-      operationId: updateVehicleVin
+      summary: Registra una única vez el VIN de un vehículo propio
+      operationId: registerVehicleVin
       security:
         - bearerAuth: []
       parameters:
@@ -232,13 +232,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/Vehicle'
         '400':
-          description: VIN inválido.
+          description: VIN inválido o ausente.
         '401':
           description: Access Token inválido o vencido.
         '404':
           description: El vehículo no existe o no pertenece a la cuenta.
         '409':
-          description: El VIN ya está asignado a otro vehículo (`VIN_ALREADY_REGISTERED`).
+          description: El VIN ya está asignado a otro vehículo (`VIN_ALREADY_REGISTERED`) o ya fue registrado y requiere corrección administrativa (`VIN_CHANGE_REQUIRES_ADMIN`).
+
+  /api/v1/admin/vehicles/{vehicleId}/vin:
+    patch:
+      tags:
+        - Administration
+      summary: Corrige un VIN registrado con auditoría administrativa
+      operationId: correctVehicleVinAsAdmin
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/VehicleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminVehicleVinCorrectionRequest'
+      responses:
+        '200':
+          description: VIN corregido y auditado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: VIN, motivo o solicitud inválidos.
+        '401':
+          description: Access Token inválido o vencido.
+        '403':
+          description: La sesión no pertenece a un administrador configurado (`ADMIN_ACCESS_REQUIRED`).
+        '404':
+          description: El vehículo no existe.
+        '409':
+          description: El nuevo VIN ya está asignado a otro vehículo (`VIN_ALREADY_REGISTERED`).
 
 components:
   parameters:
@@ -392,8 +426,22 @@ components:
         - vin
       properties:
         vin:
-          type: [string, 'null']
-          description: VIN único de 17 caracteres o null cuando sigue pendiente.
+          type: string
+          description: VIN único de 17 caracteres. Solo se admite cuando el vehículo aún no tiene VIN.
+
+    AdminVehicleVinCorrectionRequest:
+      type: object
+      required:
+        - vin
+        - reason
+      properties:
+        vin:
+          type: string
+          description: Nuevo VIN único de 17 caracteres.
+        reason:
+          type: string
+          maxLength: 300
+          description: Motivo obligatorio de la corrección administrativa.
 
     VehicleListResponse:
       type: object

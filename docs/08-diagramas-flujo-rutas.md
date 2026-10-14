@@ -6,7 +6,7 @@ Este documento muestra, de forma visual y editable, qué ocurre cuando una aplic
 
 Los diagramas están escritos con **Mermaid**, por lo que GitHub los muestra como diagramas y cualquier integrante puede actualizar el texto directamente en este archivo. No son imágenes fijas.
 
-**Última actualización:** 9 de octubre de 2026.
+**Última actualización:** 14 de octubre de 2026.
 
 ## Cómo mantenerlo actualizado
 
@@ -32,8 +32,9 @@ La regla es: una ruta nueva no se considera terminada si no tiene contrato, diag
 | Vehículos | `GET /api/v1/vehicles` | Disponible | [Ver flujo](#7-listar-los-vehículos-de-la-cuenta) |
 | Vehículos | `GET /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#8-consultar-un-vehículo) |
 | Vehículos | `PATCH /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#9-actualizar-información-básica-del-vehículo) |
-| Vehículos | `PATCH /api/v1/vehicles/{vehicleId}/vin` | Disponible | [Ver flujo](#10-registrar-o-corregir-el-vin) |
-| Administración | `PATCH /api/v1/admin/vehicles/{vehicleId}/plate` | Disponible | [Ver flujo](#11-corregir-una-placa-por-un-administrador) |
+| Vehículos | `PATCH /api/v1/vehicles/{vehicleId}/vin` | Disponible | [Ver flujo](#10-registrar-el-vin-una-sola-vez) |
+| Administración | `PATCH /api/v1/admin/vehicles/{vehicleId}/plate` | Disponible | [Ver flujo](#11-correcciones-administrativas-de-placa-o-vin) |
+| Administración | `PATCH /api/v1/admin/vehicles/{vehicleId}/vin` | Disponible | [Ver flujo](#11-correcciones-administrativas-de-placa-o-vin) |
 | Vehículos | `DELETE /api/v1/vehicles/{vehicleId}` | Disponible | [Ver flujo](#12-retirar-un-vehículo-de-la-lista) |
 | Vehículos | `GET /api/v1/vehicles/active` | Disponible | [Ver flujo](#13-consultar-el-vehículo-activo) |
 | Vehículos | `PUT /api/v1/vehicles/active` | Disponible | [Ver flujo](#14-cambiar-el-vehículo-activo) |
@@ -169,22 +170,26 @@ flowchart TD
     J --> K[Aplicación refresca el detalle]
 ```
 
-## 10. Registrar o corregir el VIN
+## 10. Registrar el VIN una sola vez
 
 ```mermaid
 flowchart TD
-    A[Usuario registra o corrige VIN] --> B[PATCH VIN del vehículo + accessToken]
+    A[Usuario registra VIN] --> B[PATCH VIN del vehículo + accessToken]
     B --> C[Backend valida sesión y propiedad]
     C --> D{¿Vehículo propio?}
     D -->|No| E[404: vehículo no encontrado]
-    D -->|Sí| F{¿VIN vacío o de 17 caracteres válidos?}
-    F -->|No| G[400: VIN inválido]
-    F -->|Sí| H[(MongoDB: guardar VIN o null)]
-    H --> I[200: vehículo actualizado]
-    I --> J[Aplicación muestra el nuevo estado]
+    D -->|Sí| F{¿El vehículo aún tiene VIN pendiente?}
+    F -->|No| G[409: corrección requiere administrador]
+    F -->|Sí| H{¿VIN válido de 17 caracteres?}
+    H -->|No| I[400: VIN inválido]
+    H -->|Sí| J[(MongoDB: guardar VIN una única vez)]
+    J --> K[200: vehículo actualizado]
+    K --> L[Aplicación bloquea edición normal]
 ```
 
-## 11. Corregir una placa por un administrador
+## 11. Correcciones administrativas de placa o VIN
+
+### Placa
 
 ```mermaid
 flowchart TD
@@ -198,6 +203,22 @@ flowchart TD
     G -->|Sí| I[(MongoDB: actualizar placa y guardar auditoría)]
     I --> J[200: vehículo actualizado]
     J --> K[Historial conserva placa anterior, motivo y responsable]
+```
+
+### VIN
+
+```mermaid
+flowchart TD
+    A[Administrador reporta corrección de VIN] --> B[PATCH VIN administrativo + accessToken]
+    B --> C[Backend valida sesión]
+    C --> D{¿Correo incluido en ADMIN_EMAILS?}
+    D -->|No| E[403: acceso administrativo requerido]
+    D -->|Sí| F[Validar nuevo VIN y motivo]
+    F --> G{¿VIN válido, diferente y disponible globalmente?}
+    G -->|No| H[400 o 409: explicar corrección requerida]
+    G -->|Sí| I[(MongoDB: actualizar VIN y guardar auditoría)]
+    I --> J[200: vehículo actualizado]
+    J --> K[Historial conserva VIN anterior, motivo y responsable]
 ```
 
 ## 12. Retirar un vehículo de la lista

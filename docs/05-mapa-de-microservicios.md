@@ -79,7 +79,7 @@ Administrar toda la información relacionada con los vehículos registrados por 
 | userId         | UUID     | Sí          |
 | nickname       | String   | No          |
 | plate          | String   | Sí          |
-| vin            | String   | Sí          |
+| vin            | String   | No; puede quedar pendiente y registrarse una única vez. |
 | brand          | String   | Sí          |
 | model          | String   | Sí          |
 | year           | Integer  | Sí          |
@@ -95,15 +95,15 @@ Administrar toda la información relacionada con los vehículos registrados por 
 | Método | Endpoint                       | Descripción             |
 | ------ | ------------------------------ | ----------------------- |
 | POST   | `/api/v1/vehicles`             | Registrar un vehículo.  |
-| GET    | `/api/v1/vehicles/vin/{vin}`   | Registrar un vehículo.  |
 | GET    | `/api/v1/vehicles`             | Listar mis vehículos.   |
 | GET    | `/api/v1/vehicles/{vehicleId}` | Consultar un vehículo.  |
-| PUT    | `/api/v1/vehicles/{vehicleId}` | Actualizar un vehículo. |
+| PATCH  | `/api/v1/vehicles/{vehicleId}` | Actualizar información básica del vehículo. |
+| PATCH  | `/api/v1/vehicles/{vehicleId}/vin` | Registrar una única vez el VIN pendiente. |
+| PATCH  | `/api/v1/admin/vehicles/{vehicleId}/vin` | Corregir VIN como administrador con auditoría. |
 | DELETE | `/api/v1/vehicles/{vehicleId}` | Eliminar un vehículo.   |
 
 ## Funcionalidades futuras
 
-| PATCH | `/api/v1/vehicles/{vehicleId}/vin` |(Sujeto a reglas de negocio)|
 | POST | `/api/v1/vehicles/{vehicleId}/force-disconnect` |(Sujeto a reglas de negocio)|
 
 ## Base de datos
@@ -257,23 +257,24 @@ Pendiente.
 
 ---
 
-# 7. actualizar el VIN
+# 7. Registrar y corregir el VIN
 
 ## Responsabilidad
 
-Permite actualizar el VIN de un vehículo.
+Permite registrar una única vez el VIN pendiente de un vehículo. Las correcciones posteriores se realizan por administración.
 
 ## Funcionalidades
 
-- Solo si el vehículo no tiene lecturas OBD.
-- Solo si no tiene diagnósticos.
-- Solo si no tiene mantenimientos.
+- El propietario solo puede registrarlo cuando el VIN está pendiente.
+- Después del primer registro, el propietario no puede borrarlo ni reemplazarlo.
+- Un administrador puede corregirlo con motivo obligatorio y auditoría de VIN anterior, VIN nuevo, fecha y responsable.
 
 ## APIs
 
 | Método | Endpoint                           |
 | ------ | ---------------------------------- |
 | PATCH  | `/api/v1/vehicles/{vehicleId}/vin` |
+| PATCH  | `/api/v1/admin/vehicles/{vehicleId}/vin` |
 
 ## Request
 

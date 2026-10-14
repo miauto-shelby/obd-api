@@ -378,13 +378,13 @@ El kilometraje es la base para calcular mantenimientos, alertas y estadísticas.
 
 **Decisión:**
 
-- El VIN podrá modificarse únicamente mientras el vehículo no tenga información operativa asociada.
-- Si ya existen lecturas OBD, diagnósticos, mantenimientos o alertas, el VIN quedará bloqueado.
-- Si es necesario cambiarlo después, deberá hacerlo un administrador mediante un proceso controlado.
+- El usuario puede registrar el VIN una sola vez, únicamente mientras el vehículo tenga el campo pendiente.
+- Una vez registrado, el propietario no puede borrarlo ni reemplazarlo, incluso antes de recibir lecturas OBD.
+- Una corrección posterior requiere un administrador, un motivo obligatorio y una auditoría con VIN anterior, VIN nuevo, fecha y responsable.
 
 **Justificación:**
 
-- la experiencia del usuario con la integridad de la información y evita problemas cuando el vehículo ya tiene un historial asociado.
+- Protege la identidad técnica del vehículo desde el primer registro y evita que cambios posteriores mezclen datos, diagnósticos, mantenimientos o lecturas OBD de vehículos distintos.
 
 **Estado:**
 

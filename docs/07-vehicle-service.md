@@ -13,10 +13,11 @@ Cada vehículo pertenece al usuario de la sesión autenticada. Este primer alcan
 | `GET` | `/api/v1/vehicles/active` | Consulta el vehículo activo de la cuenta. |
 | `PUT` | `/api/v1/vehicles/active` | Cambia el vehículo activo de la cuenta. |
 | `GET` | `/api/v1/vehicles/{vehicleId}` | Consulta el detalle de un vehículo propio. |
-| `PATCH` | `/api/v1/vehicles/{vehicleId}/vin` | Registra, corrige o deja pendiente el VIN de un vehículo propio. |
+| `PATCH` | `/api/v1/vehicles/{vehicleId}/vin` | Registra una sola vez el VIN de un vehículo propio que aún no lo tiene. |
 | `PATCH` | `/api/v1/vehicles/{vehicleId}` | Actualiza la información básica del vehículo. |
 | `DELETE` | `/api/v1/vehicles/{vehicleId}` | Desactiva un vehículo propio sin borrar su historial. |
 | `PATCH` | `/api/v1/admin/vehicles/{vehicleId}/plate` | Corrige una placa errónea; solo administrador y con auditoría. |
+| `PATCH` | `/api/v1/admin/vehicles/{vehicleId}/vin` | Corrige un VIN ya registrado; solo administrador, motivo obligatorio y auditoría. |
 
 Todas requieren `Authorization: Bearer <accessToken>`. El usuario se obtiene del token. La app no puede asignar el vehículo a otra cuenta. La última ruta exige además que el correo del token esté configurado como administrador en el backend.
 
@@ -67,7 +68,7 @@ La respuesta de creación es `201` con el vehículo registrado. La respuesta de 
 
 El vehículo debe pertenecer a la cuenta y estar activo. La respuesta `200` devuelve el vehículo que quedó seleccionado. La selección se guarda en el backend para que se mantenga al cambiar de teléfono.
 
-## Registrar o corregir VIN
+## Registrar VIN una sola vez
 
 `PATCH /api/v1/vehicles/{vehicleId}/vin` recibe:
 
@@ -75,7 +76,9 @@ El vehículo debe pertenecer a la cuenta y estar activo. La respuesta `200` devu
 { "vin": "1HGCM82633A004352" }
 ```
 
-El valor debe tener 17 caracteres válidos. También puede recibirse `null` para conservar el vehículo y marcar el VIN como pendiente. Un VIN ya asignado a otro vehículo responde `409 VIN_ALREADY_REGISTERED`. La respuesta correcta es `200` con el vehículo actualizado.
+Esta ruta solo está disponible mientras el vehículo tenga el VIN pendiente (`null`). El valor es obligatorio y debe tener 17 caracteres válidos. Un VIN ya asignado a otro vehículo responde `409 VIN_ALREADY_REGISTERED`.
+
+Después de registrarlo, el propietario no puede borrarlo ni reemplazarlo: la ruta responde `409 VIN_CHANGE_REQUIRES_ADMIN`. La respuesta correcta es `200` con el vehículo actualizado. El VIN puede omitirse únicamente al crear el vehículo, para registrarlo después una única vez.
 
 ## Actualizar información básica
 
@@ -101,3 +104,16 @@ El valor debe tener 17 caracteres válidos. También puede recibirse `null` para
 ```
 
 La nueva placa debe ser distinta, válida y no puede pertenecer a ningún otro vehículo de la plataforma. El resultado exitoso es `200`. Si el usuario no es administrador responde `403 ADMIN_ACCESS_REQUIRED`; si la placa ya existe responde `409 VEHICLE_ALREADY_EXISTS`. Cada cambio conserva internamente placa anterior, placa nueva, motivo, fecha y administrador responsable.
+
+## Corregir VIN como administrador
+
+`PATCH /api/v1/admin/vehicles/{vehicleId}/vin` está reservada para corregir un VIN digitado erróneamente. No está disponible desde la aplicación de usuarios; exige que el correo de la sesión figure en `ADMIN_EMAILS`.
+
+```json
+{
+  "vin": "1M8GDM9AXKP042788",
+  "reason": "VIN digitado incorrectamente durante el registro inicial."
+}
+```
+
+El nuevo VIN debe tener 17 caracteres válidos, ser distinto al actual y no pertenecer a otro vehículo. El motivo es obligatorio. La respuesta correcta es `200`; sin permiso administrativo responde `403 ADMIN_ACCESS_REQUIRED`, y si el VIN pertenece a otro vehículo responde `409 VIN_ALREADY_REGISTERED`. El backend conserva internamente el VIN anterior, el nuevo VIN, motivo, fecha y administrador responsable.
